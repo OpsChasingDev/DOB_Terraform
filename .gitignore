@@ -1,4 +1,3 @@
-main.tf
 .terraform/*
 terraform.tfvars
 *.tfstate.*
