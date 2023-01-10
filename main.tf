@@ -15,6 +15,7 @@ variable "vpc_cidr_block" {}
 variable "subnet_cidr_block" {}
 variable "avail_zone" {}
 variable "env_prefix" {}
+variable "my_ip" {}
 
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -62,4 +63,41 @@ resource "aws_internet_gateway" "nginx-igw" {
 resource "aws_route_table_association" "nginx-rtb-subnet" {
   subnet_id      = aws_subnet.nginx-subnet-1.id
   route_table_id = aws_route_table.nginx-route-table.id
+}
+
+resource "aws_security_group" "nginx-security-group" {
+  name   = "nginx-security-group"
+  vpc_id = aws_vpc.nginx-vpc.id
+
+  # ssh
+  ingress {
+    # from_port and to_port specify a range, e.g. from port 56000-58000
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+  # 8080
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # configured for "any"
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+    prefix_list_ids = []
+  }
+
+  tags = {
+    Name        = "${var.env_prefix}-nginx-security-group"
+    Environment = var.env_prefix
+    Terraform   = "True"
+  }
+
 }
