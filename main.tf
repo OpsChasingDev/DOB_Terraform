@@ -14,12 +14,13 @@ provider "aws" {
 variable "vpc_cidr_block" {}
 variable "subnet_cidr_block" {}
 variable "avail_zone" {}
+variable "env_prefix" {}
 
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
-    Name        = "nginx-VPC"
-    Environment = "dev"
+    Name        = "${var.env_prefix}-nginx-VPC"
+    Environment = var.env_prefix
     Terraform   = "True"
   }
 }
@@ -29,8 +30,30 @@ resource "aws_subnet" "nginx-subnet-1" {
   cidr_block        = var.subnet_cidr_block
   availability_zone = var.avail_zone
   tags = {
-    Name        = "nginx-subnet-1"
-    Environment = "dev"
+    Name        = "${var.env_prefix}-nginx-subnet-1"
+    Environment = var.env_prefix
+    Terraform   = "True"
+  }
+}
+
+resource "aws_route_table" "nginx-route-table" {
+  vpc_id = aws_vpc.nginx-vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.nginx-igw.id
+  }
+  tags = {
+    Name        = "${var.env_prefix}-nginx-route-table"
+    Environment = var.env_prefix
+    Terraform   = "True"
+  }
+}
+
+resource "aws_internet_gateway" "nginx-igw" {
+  vpc_id = aws_vpc.nginx-vpc.id
+  tags = {
+    Name        = "${var.env_prefix}-nginx-igw"
+    Environment = var.env_prefix
     Terraform   = "True"
   }
 }
