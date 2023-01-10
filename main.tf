@@ -11,30 +11,25 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
-variable "vpc_cidr_block" {
-  description = "vpc cidr block"
-}
-variable "subnet_cidr_block" {
-  description = "subnet cidr block"
-  default     = ""
-  type        = string
-}
+variable "vpc_cidr_block" {}
+variable "subnet_cidr_block" {}
+variable "avail_zone" {}
 
-resource "aws_vpc" "development-vpc" {
+resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
-    Name        = "VPC"
+    Name        = "nginx-VPC"
     Environment = "dev"
     Terraform   = "True"
   }
 }
 
-resource "aws_subnet" "development-subnet" {
-  vpc_id            = aws_vpc.development-vpc.id
+resource "aws_subnet" "nginx-subnet-1" {
+  vpc_id            = aws_vpc.nginx-vpc.id
   cidr_block        = var.subnet_cidr_block
-  availability_zone = "us-east-1a"
+  availability_zone = var.avail_zone
   tags = {
-    Name        = "Subnet"
+    Name        = "nginx-subnet-1"
     Environment = "dev"
     Terraform   = "True"
   }
