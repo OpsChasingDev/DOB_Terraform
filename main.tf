@@ -57,3 +57,9 @@ resource "aws_internet_gateway" "nginx-igw" {
     Terraform   = "True"
   }
 }
+
+# we don't want to use the default route table for our subnet as a best practice
+resource "aws_route_table_association" "nginx-rtb-subnet" {
+  subnet_id      = aws_subnet.nginx-subnet-1.id
+  route_table_id = aws_route_table.nginx-route-table.id
+}
