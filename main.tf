@@ -16,26 +16,26 @@ variable "vpc_cidr_block" {
 }
 variable "subnet_cidr_block" {
   description = "subnet cidr block"
-  default = ""
-  type = string
+  default     = ""
+  type        = string
 }
 
 resource "aws_vpc" "development-vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
-    Name = "VPC"
+    Name        = "VPC"
     Environment = "dev"
-    Terraform = "True"
+    Terraform   = "True"
   }
 }
 
 resource "aws_subnet" "development-subnet" {
-  vpc_id = aws_vpc.development-vpc.id
-  cidr_block = var.subnet_cidr_block
+  vpc_id            = aws_vpc.development-vpc.id
+  cidr_block        = var.subnet_cidr_block
   availability_zone = "us-east-1a"
   tags = {
-    Name = "Subnet"
+    Name        = "Subnet"
     Environment = "dev"
-    Terraform = "True"
+    Terraform   = "True"
   }
 }
