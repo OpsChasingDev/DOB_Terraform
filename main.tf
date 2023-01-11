@@ -120,8 +120,18 @@ data "aws_ami" "latest-aws-linux-image" {
 output "aws_ami_id" {
   value = data.aws_ami.latest-aws-linux-image.id
 }
+output "ec2_public_ip" {
+  value = aws_instance.nginx-server.public_ip
+}
 
 resource "aws_key_pair" "ssh-key" {
+  /*
+    when using a private/public key like this instead of a .pem file,
+    ssh -i ~/.ssh/id_rsa ec2-user@{public_ip}
+    OR
+    ssh ec2-user@{public_ip}
+    because ssh pulls the default private key location
+  */
   key_name   = "nginx-key"
   public_key = file(var.public_key_path)
 }
