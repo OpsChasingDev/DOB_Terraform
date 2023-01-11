@@ -16,6 +16,7 @@ variable "subnet_cidr_block" {}
 variable "avail_zone" {}
 variable "env_prefix" {}
 variable "my_ip" {}
+variable "instance_type" {}
 
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -100,4 +101,40 @@ resource "aws_security_group" "nginx-security-group" {
     Terraform   = "True"
   }
 
+}
+
+data "aws_ami" "latest-aws-linux-image" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-kernel*x86_64-gp2"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+output "aws_ami_id" {
+  value = data.aws_ami.latest-aws-linux-image.id
+}
+
+resource "aws_instance" "nginx-server" {
+  # amazon machine image
+  ami           = data.aws_ami.latest-aws-linux-image.id
+  instance_type = var.instance_type
+
+  subnet_id              = aws_subnet.nginx-subnet-1.id
+  vpc_security_group_ids = [aws_security_group.nginx-security-group.id]
+  availability_zone      = var.avail_zone
+
+  associate_public_ip_address = true
+  key_name                    = "EC2_Purple"
+
+  tags = {
+    Name        = "${var.env_prefix}-nginx-server"
+    Environment = var.env_prefix
+    Terraform   = "True"
+  }
 }
