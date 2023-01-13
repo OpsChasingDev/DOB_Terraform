@@ -148,6 +148,20 @@ resource "aws_instance" "nginx-server" {
   associate_public_ip_address = true
   key_name                    = aws_key_pair.ssh-key.key_name
 
+  /*
+  # this part will only be executed once on the initial run of the server
+  user_data = <<EOF
+                  #!/bin/bash
+                  sudo yum update -y && sudo yum install -y docker
+                  sudo systemctl start docker
+                  sudo usermod -aG docker ec2-user
+                  sudo chmod 666 /var/run/docker.sock
+                  docker run -p 8080:80 nginx
+              EOF
+  */
+
+  user_data = file("entry-script.sh")
+
   tags = {
     Name        = "${var.env_prefix}-nginx-server"
     Environment = var.env_prefix
