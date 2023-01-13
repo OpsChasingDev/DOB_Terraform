@@ -18,6 +18,7 @@ variable "env_prefix" {}
 variable "my_ip" {}
 variable "instance_type" {}
 variable "public_key_path" {}
+variable "private_key_location" {}
 
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -161,6 +162,35 @@ resource "aws_instance" "nginx-server" {
   */
 
   user_data = file("entry-script.sh")
+
+  # connection and provisioner used to connect to server via SSH or WinRM
+  # THESE ARE NOT RECOMMENDED TO USE - NOT IDEMPOTENT AND LIMITED IN FUNCTIONALITY
+  connection {
+    type        = "ssh" # winrm is also a type
+    host        = self.public_ip
+    user        = "ec2-user"
+    private_key = file(var.private_key_location)
+  }
+
+  provisioner "file" {
+    source      = "entry-script.sh"
+    destination = "/hom/ec2-user/entry-script.sh"
+  }
+
+  provisioner "remote-exec" {
+    # inline is for direct execution
+    inline = [
+      "export ENV=dev",
+      "mkdir newdir",
+    ]
+    # a script can be specified with the "file" provisioner to copy a script to the server and execute it
+    script = file("entry-script.sh")
+  }
+
+  provisioner "local-exec" {
+    # these commands will be executed locally from the machine you run terraform commands
+    command = "echo ${self.public_ip} > output.txt"
+  }
 
   tags = {
     Name        = "${var.env_prefix}-nginx-server"
