@@ -1,23 +1,8 @@
-variable "aws_access_key" {
-  description = "access key for AWS account"
-}
-variable "aws_secret_key" {
-  description = "secret key for AWS account"
-}
-
 provider "aws" {
   region     = "us-east-1"
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
 }
-
-variable "vpc_cidr_block" {}
-variable "subnet_cidr_block" {}
-variable "avail_zone" {}
-variable "env_prefix" {}
-variable "my_ip" {}
-variable "instance_type" {}
-variable "public_key_path" {}
 
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -115,13 +100,6 @@ data "aws_ami" "latest-aws-linux-image" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-}
-
-output "aws_ami_id" {
-  value = data.aws_ami.latest-aws-linux-image.id
-}
-output "ec2_public_ip" {
-  value = aws_instance.nginx-server.public_ip
 }
 
 resource "aws_key_pair" "ssh-key" {
