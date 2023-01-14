@@ -1,3 +1,15 @@
+# Local terraform directories
 .terraform
+
+# .tfstate files
 *.tfstate*
-terraform.tfvars
+
+# tfvars file containing sensitive information
+*.tfvars
+
+# terraform CLI config files
+.terraformrc
+terraform.rc
+
+# crash file
+crash.log
