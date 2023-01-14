@@ -4,6 +4,14 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
+module "nginx-subnet" {
+  source            = "./modules/subnet"
+  subnet_cidr_block = var.subnet_cidr_block
+  avail_zone        = var.avail_zone
+  env_prefix        = var.env_prefix
+  vpc_id            = aws_vpc.nginx-vpc.id
+}
+
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
@@ -13,43 +21,10 @@ resource "aws_vpc" "nginx-vpc" {
   }
 }
 
-resource "aws_subnet" "nginx-subnet-1" {
-  vpc_id            = aws_vpc.nginx-vpc.id
-  cidr_block        = var.subnet_cidr_block
-  availability_zone = var.avail_zone
-  tags = {
-    Name        = "${var.env_prefix}-nginx-subnet-1"
-    Environment = var.env_prefix
-    Terraform   = "True"
-  }
-}
-
-resource "aws_route_table" "nginx-route-table" {
-  vpc_id = aws_vpc.nginx-vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.nginx-igw.id
-  }
-  tags = {
-    Name        = "${var.env_prefix}-nginx-route-table"
-    Environment = var.env_prefix
-    Terraform   = "True"
-  }
-}
-
-resource "aws_internet_gateway" "nginx-igw" {
-  vpc_id = aws_vpc.nginx-vpc.id
-  tags = {
-    Name        = "${var.env_prefix}-nginx-igw"
-    Environment = var.env_prefix
-    Terraform   = "True"
-  }
-}
-
 # we don't want to use the default route table for our subnet as a best practice
 resource "aws_route_table_association" "nginx-rtb-subnet" {
-  subnet_id      = aws_subnet.nginx-subnet-1.id
-  route_table_id = aws_route_table.nginx-route-table.id
+  subnet_id      = module.nginx-subnet.subnet.id
+  route_table_id = module.nginx-subnet.route_table.id
 }
 
 resource "aws_security_group" "nginx-security-group" {
@@ -119,7 +94,7 @@ resource "aws_instance" "nginx-server" {
   ami           = data.aws_ami.latest-aws-linux-image.id
   instance_type = var.instance_type
 
-  subnet_id              = aws_subnet.nginx-subnet-1.id
+  subnet_id              = module.nginx-subnet.subnet.id
   vpc_security_group_ids = [aws_security_group.nginx-security-group.id]
   availability_zone      = var.avail_zone
 
