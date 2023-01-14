@@ -1,16 +1,15 @@
-variable "aws_access_key" {
-  description = "access key for AWS account"
-}
-variable "aws_secret_key" {
-  description = "secret key for AWS account"
-}
-
 provider "aws" {
   region     = "us-east-1"
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
 }
 
+variable "aws_access_key" {
+  description = "access key for AWS account"
+}
+variable "aws_secret_key" {
+  description = "secret key for AWS account"
+}
 variable "vpc_cidr_block" {}
 variable "private_subnet_cidr_blocks" {}
 variable "public_subnet_cidr_blocks" {}
