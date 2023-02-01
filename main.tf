@@ -121,7 +121,7 @@ output "aws_ami_id" {
   value = data.aws_ami.latest-aws-linux-image.id
 }
 output "ec2_public_ip" {
-  value = aws_instance.nginx-server.public_ip
+  value = aws_instance.nginx-server-1.public_ip
 }
 
 resource "aws_key_pair" "ssh-key" {
@@ -136,7 +136,7 @@ resource "aws_key_pair" "ssh-key" {
   public_key = file(var.public_key_path)
 }
 
-resource "aws_instance" "nginx-server" {
+resource "aws_instance" "nginx-server-1" {
   # amazon machine image
   ami           = data.aws_ami.latest-aws-linux-image.id
   instance_type = var.instance_type
@@ -163,7 +163,71 @@ resource "aws_instance" "nginx-server" {
   user_data = file("entry-script.sh")
 
   tags = {
-    Name        = "${var.env_prefix}-nginx-server"
+    Name        = "${var.env_prefix}-nginx-server-1"
+    Environment = var.env_prefix
+    Terraform   = "True"
+  }
+}
+resource "aws_instance" "nginx-server-2" {
+  # amazon machine image
+  ami           = data.aws_ami.latest-aws-linux-image.id
+  instance_type = var.instance_type
+
+  subnet_id              = aws_subnet.nginx-subnet-1.id
+  vpc_security_group_ids = [aws_security_group.nginx-security-group.id]
+  availability_zone      = var.avail_zone
+
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.ssh-key.key_name
+
+  /*
+  # this part will only be executed once on the initial run of the server
+  user_data = <<EOF
+                  #!/bin/bash
+                  sudo yum update -y && sudo yum install -y docker
+                  sudo systemctl start docker
+                  sudo usermod -aG docker ec2-user
+                  sudo chmod 666 /var/run/docker.sock
+                  docker run -p 8080:80 nginx
+              EOF
+  */
+
+  user_data = file("entry-script.sh")
+
+  tags = {
+    Name        = "${var.env_prefix}-nginx-server-2"
+    Environment = var.env_prefix
+    Terraform   = "True"
+  }
+}
+resource "aws_instance" "nginx-server-3" {
+  # amazon machine image
+  ami           = data.aws_ami.latest-aws-linux-image.id
+  instance_type = var.instance_type
+
+  subnet_id              = aws_subnet.nginx-subnet-1.id
+  vpc_security_group_ids = [aws_security_group.nginx-security-group.id]
+  availability_zone      = var.avail_zone
+
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.ssh-key.key_name
+
+  /*
+  # this part will only be executed once on the initial run of the server
+  user_data = <<EOF
+                  #!/bin/bash
+                  sudo yum update -y && sudo yum install -y docker
+                  sudo systemctl start docker
+                  sudo usermod -aG docker ec2-user
+                  sudo chmod 666 /var/run/docker.sock
+                  docker run -p 8080:80 nginx
+              EOF
+  */
+
+  user_data = file("entry-script.sh")
+
+  tags = {
+    Name        = "${var.env_prefix}-nginx-server-3"
     Environment = var.env_prefix
     Terraform   = "True"
   }
