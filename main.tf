@@ -160,7 +160,7 @@ resource "aws_instance" "nginx-server-1" {
               EOF
   */
 
-  user_data = file("entry-script.sh")
+  # user_data = file("entry-script.sh")
 
   tags = {
     Name        = "${var.env_prefix}-nginx-server-1"
@@ -192,7 +192,7 @@ resource "aws_instance" "nginx-server-2" {
               EOF
   */
 
-  user_data = file("entry-script.sh")
+  # user_data = file("entry-script.sh")
 
   tags = {
     Name        = "${var.env_prefix}-nginx-server-2"
@@ -224,7 +224,7 @@ resource "aws_instance" "nginx-server-3" {
               EOF
   */
 
-  user_data = file("entry-script.sh")
+  # user_data = file("entry-script.sh")
 
   tags = {
     Name        = "${var.env_prefix}-nginx-server-3"
