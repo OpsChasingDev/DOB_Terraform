@@ -18,6 +18,7 @@ variable "env_prefix" {}
 variable "my_ip" {}
 variable "instance_type" {}
 variable "public_key_path" {}
+variable "ssh_key_private" {}
 
 resource "aws_vpc" "nginx-vpc" {
   cidr_block = var.vpc_cidr_block
@@ -171,7 +172,7 @@ resource "aws_instance" "nginx-server-1" {
   # this provisioner allows Terraform to call the Ansible playbook
   provisioner "local_exec" {
     working_dir = "C:/git/DOB_Ansible/docker_apps"
-    command     = "ansible-playbook --inventory ${self.public_ip}, deploy-docker.yaml"
+    command     = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_key_private} deploy-docker.yaml"
   }
 }
 resource "aws_instance" "nginx-server-2" {
