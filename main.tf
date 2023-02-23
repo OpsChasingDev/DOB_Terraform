@@ -167,6 +167,12 @@ resource "aws_instance" "nginx-server-1" {
     Environment = var.env_prefix
     Terraform   = "True"
   }
+
+  # this provisioner allows Terraform to call the Ansible playbook
+  provisioner "local_exec" {
+    working_dir = "C:/git/DOB_Ansible/docker_apps"
+    command     = "ansible-playbook deploy-docker.yaml"
+  }
 }
 resource "aws_instance" "nginx-server-2" {
   # amazon machine image
