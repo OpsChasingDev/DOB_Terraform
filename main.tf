@@ -172,7 +172,7 @@ resource "aws_instance" "nginx-server-1" {
   # this provisioner allows Terraform to call the Ansible playbook
   provisioner "local_exec" {
     working_dir = "C:/git/DOB_Ansible/docker_apps"
-    command     = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_key_private} deploy-docker.yaml"
+    command     = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_key_private} --user ec2-user deploy-docker.yaml"
   }
 }
 resource "aws_instance" "nginx-server-2" {
