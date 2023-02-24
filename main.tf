@@ -170,12 +170,26 @@ resource "aws_instance" "nginx-server-1" {
   }
 
   # this provisioner allows Terraform to call the Ansible playbook
+  # also see the "null_resource" below as another example of how to do this in a segregated resource definition
   provisioner "local-exec" {
     working_dir = "/home/robert/git/DOB_Ansible/docker_apps"
     #working_dir = "C:/git/DOB_Ansible/docker_apps"
     command = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_key_private} --user ec2-user deploy-docker.yaml"
   }
 }
+
+# resource "null_resource" "example_of_null_resource" {
+#   trigger = {
+#     trigger = aws_instance.nginx-server-1.public_ip
+#   }
+
+#   provisioner "local-exec" {
+#       working_dir = "/home/robert/git/DOB_Ansible/docker_apps"
+#       #working_dir = "C:/git/DOB_Ansible/docker_apps"
+#       command = "ansible-playbook --inventory ${aws_instance.nginx-server-1.public_ip}, --private-key ${var.ssh_key_private} --user ec2-user deploy-docker.yaml"
+#   }
+# }
+
 resource "aws_instance" "nginx-server-2" {
   # amazon machine image
   ami           = data.aws_ami.latest-aws-linux-image.id
