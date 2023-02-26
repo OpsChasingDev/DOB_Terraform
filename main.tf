@@ -225,7 +225,7 @@ resource "aws_instance" "nginx-server-2" {
 resource "aws_instance" "nginx-server-3" {
   # amazon machine image
   ami           = data.aws_ami.latest-aws-linux-image.id
-  instance_type = var.instance_type
+  instance_type = "t2.small"
 
   subnet_id              = aws_subnet.nginx-subnet-1.id
   vpc_security_group_ids = [aws_security_group.nginx-security-group.id]
