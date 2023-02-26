@@ -21,7 +21,8 @@ variable "public_key_path" {}
 variable "ssh_key_private" {}
 
 resource "aws_vpc" "nginx-vpc" {
-  cidr_block = var.vpc_cidr_block
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_hostnames = true
   tags = {
     Name        = "${var.env_prefix}-nginx-VPC"
     Environment = var.env_prefix
